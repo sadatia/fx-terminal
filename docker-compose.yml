@@ -1,0 +1,9 @@
+services:
+  sadatia-fx-replay:
+    build: .
+    container_name: sadatia-fx-replay
+    restart: unless-stopped
+    ports:
+      - "5590:80"
+    volumes:
+      - ./History-Data:/usr/share/nginx/html/data:ro
