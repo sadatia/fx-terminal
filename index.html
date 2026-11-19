@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SADATIA FX Replay & SMC Practice Terminal v6.7</title>
+<title>SBT 27 Practice Terminal v6.7</title>
 <style>
   :root {
     --bg-main: #131722;
@@ -151,7 +151,7 @@
 
   /* Left Drawing Toolbar */
   .toolbar-left {
-    width: 46px;
+    width: 50px;
     background: var(--bg-panel);
     border-right: 1px solid var(--border);
     display: flex;
@@ -163,8 +163,8 @@
     overflow-y: auto;
   }
   .tool-btn {
-    width: 36px;
-    height: 27px;
+    width: 40px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -332,6 +332,22 @@
     flex-direction: column;
     overflow-y: auto;
     flex-shrink: 0;
+    transition: width 0.16s ease;
+  }
+  .panel-right.collapsed {
+    display: none;
+  }
+  .panel-toggle-btn {
+    margin-left: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border-color: var(--border);
+  }
+  .panel-toggle-btn.active {
+    background: var(--bg-hover);
+    color: var(--accent);
+    border-color: var(--accent);
   }
   .section { padding: 10px 12px; border-bottom: 1px solid var(--border); }
   .section-title {
@@ -516,7 +532,11 @@
   .bottom-overlay-dock.collapsed .dock-collapsed-pill {
     display: inline-block;
   }
-
+.tool-btn-dock { display: inline-flex; align-items: center; gap: 5px; }
+.tool-btn.active::before {
+  content: ""; position: absolute; left: -5px; top: 5px; bottom: 5px;
+  width: 3px; border-radius: 2px; background: #fff;
+}
   @media (max-width: 900px) {
     body { height: auto; overflow-y: auto; }
     .workspace { flex-direction: column; }
@@ -536,8 +556,83 @@
     .ind-modal { left: 10px; width: calc(100% - 20px); }
     .sc-grid { grid-template-columns: 1fr; }
   }
+
+/*SB7*/
+.sb-cover{position:absolute;top:0;right:0;bottom:26px;width:68px;background:#131722;z-index:7;display:none}
+body.blind .sb-cover{display:block}
+body.blind #status-price,body.blind .hud-ohlc b,body.blind #quote-bid,body.blind #quote-ask{filter:blur(7px)}
+#sb-toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1e222d;border:1px solid var(--accent);color:#fff;padding:7px 14px;border-radius:6px;z-index:90;font-size:12px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);max-width:80vw}
+#sb-measure{position:absolute;inset:0;pointer-events:none;z-index:6}
+.sb-sel{font-size:10px;padding:1px 3px;max-width:96px}
+.sb-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0}
+.sb-row input[type=number]{width:70px}
+.htf-hud,.chart-hud{top:46px}
+
+
+.btn-cut {
+      border-color: rgba(255, 152, 0, 0.6);
+      color: #ffb74d;
+    }
+    .btn-cut:hover:not(:disabled) {
+      background: rgba(255, 152, 0, 0.18);
+      border-color: var(--warn);
+      color: #fff;
+    }
+    .btn-cut.active {
+      background: var(--warn);
+      border-color: var(--warn);
+      color: #131722;
+      font-weight: 800;
+    }
+
+    #cut-mode-banner {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 35;
+      background: rgba(255, 152, 0, 0.96);
+      color: #131722;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 11px;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    }
+
+    #cut-mode-banner button {
+      background: #131722;
+      color: #fff;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+    }
+
+
+
+
+/* ===== COMPACT TOP MENU ===== */
+header{height:34px;padding:0 6px;gap:4px}
+header button,header select,header input{height:25px;padding:0 7px;font-size:13px;line-height:23px}
+header .brand{font-size:13px;margin-right:0}
+header .divider{height:14px}
+header label{display:none}
+header .tf-btn{padding:0 6px}
+header .sess-jump-group{gap:2px}
+header .sess-jump-group button{padding:0 6px;font-size:12px}
+header #symbol-select{max-width:92px}
+header #step-size,header #play-speed{max-width:68px}
+header #replay-start{width:152px;padding:0 3px}
+header .status-pill{gap:6px;font-size:13px}
+header .panel-toggle-btn{margin-left:0;padding:0 6px}
+header .idb-badge{padding:0 5px;line-height:16px;font-size:11px}
 </style>
 </head>
+
 <body>
 
 
@@ -546,7 +641,7 @@
 <header>
   <span class="brand">SADATIA</span>
   <input type="file" id="csv-input" accept=".csv,.txt" multiple style="display:none" />
-  <button id="btn-load-csv" class="btn-primary" title="Load one or multiple M1 CSV files (auto-merged & cached in IndexedDB)">Load CSV(s)</button>
+  <button id="btn-load-csv" class="btn-primary" title="Load one or multiple M1 CSV files (auto-merged & cached in IndexedDB)">CSV</button>
   
   <select id="symbol-select" title="Select Instrument Profile (Auto-detected on CSV load)">
     <option value="XAUUSD" selected>XAUUSD</option>
@@ -570,21 +665,25 @@
     <button class="tf-btn" data-tf="W1">W1</button>
   </div>
 
+
+
+
+
   <div class="divider"></div>
 
   <label style="color:var(--text-muted)">UTC:</label>
   <input type="datetime-local" id="replay-start" />
   <button id="btn-go" class="btn-primary" title="Jump to UTC timestamp (or Alt+Left-Click any candle)">Go</button>
   <button id="btn-play" title="Play / Pause (Space)">Play</button>
-  <button id="btn-step" title="Step Forward (Right Arrow)">Step &rarr;</button>
+  <button id="btn-step" title="Step Forward (Right Arrow)">&rsaquo;</button>
 
   <select id="step-size" title="Step Size">
-    <option value="1">Step: 1m</option>
-    <option value="5">Step: 5m</option>
-    <option value="15" selected>Step: 15m</option>
-    <option value="60">Step: 1h</option>
-    <option value="240">Step: 4h</option>
-    <option value="1440">Step: 1d</option>
+    <option value="1">1m</option>
+    <option value="5">5m</option>
+    <option value="15" selected>15m</option>
+    <option value="60">1h</option>
+    <option value="240">4h</option>
+    <option value="1440">1d</option>
   </select>
 
   <select id="play-speed" title="Playback Speed">
@@ -593,21 +692,23 @@
     <option value="60">Fast</option>
   </select>
 
-  <button id="btn-step-back" title="Step Backward (Left Arrow)">&larr; Back</button>
+  <button id="btn-step-back" title="Step Backward (Left Arrow)">&lsaquo;</button>
 
   <div class="divider"></div>
   <div class="sess-jump-group" title="Fast-Forward to Next Session Open (UTC)">
     <button id="btn-jump-asia" title="Jump to Next Asia Open (00:00 UTC)">Asia</button>
-    <button id="btn-jump-london" title="Jump to Next London Open (07:00 UTC)">London</button>
+    <button id="btn-jump-london" title="Jump to Next London Open (07:00 UTC)">Ln</button>
     <button id="btn-jump-ny" title="Jump to Next NY Open (12:00 UTC)">NY</button>
   </div>
-  <button id="btn-tick-sim" title="Intra-Bar Tick Simulation (4 sub-ticks per bar: O -> H/L -> L/H -> C)">Tick Sim</button>
+  <button id="btn-tick-sim" title="Intra-Bar Tick Simulation (4 sub-ticks per bar: O -> H/L -> L/H -> C)">Tick</button>
+  <button id="btn-cut-mode" class="btn-cut" title="Cut Mode (Shift+C)">Cut</button>
 
   <div class="status-pill">
-    <span id="idb-cache-badge" class="idb-badge" title="CSV cached in IndexedDB. Click to clear cached dataset.">IDB Cached</span>
+    <span id="idb-cache-badge" class="idb-badge" title="CSV cached in IndexedDB. Click to clear cached dataset.">DB</span>
     <span id="status-symbol">NO DATA</span>
     <span id="status-time">--:--</span>
     <span id="status-price" style="font-weight:700;color:#fff;">0.00</span>
+    <button id="btn-toggle-right-panel" class="panel-toggle-btn active" title="Hide / Unhide Order & Metrics Panel (Alt+R)">&raquo;</button>
   </div>
 </header>
 
@@ -800,7 +901,12 @@
         </div>
         <div class="hud-inds" id="hud-inds"></div>
       </div>
+      <div id="cut-mode-banner">
+        <span>CUT MODE: Drag chart backward, hover over desired candle &amp; click to slice</span>
+        <button id="btn-cancel-cut">Cancel (Esc)</button>
+      </div>
       <button id="rr-send-btn" title="Copy Entry, SL, and TP from selected Position Tool into Order Ticket (Enter)">Send to Order Ticket &rarr;</button>
+      
       <div id="chart-container"></div>
       <canvas id="draw-overlay"></canvas>
       <textarea id="chart-text-editor" placeholder="Type note... (Enter to save)"></textarea>
@@ -816,6 +922,7 @@
         <button id="btn-indicators" title="Configure EMA / SMA Moving Averages">EMA/SMA</button>
         <button id="btn-sessions" class="active" title="Toggle UTC Killzone Session Shading (Alt+S)">Sessions</button>
         <button id="btn-auto-smc" title="Toggle Real-Time Zero-Lookahead Auto-SMC Overlay (Unmitigated FVGs, Swing BSL/SSL, Asia H/L)" style="color:#4dd0e1;">Auto SMC</button>
+        <button id="btn-future-space" class="active" title="Expand Right Canvas Margin for Predicted Candles (Alt+F)">+Space</button>
 
         <div class="dock-sep"></div>
 
@@ -1116,7 +1223,7 @@ const LightweightCharts = (() => {
     let lineSeriesList = [];
     let priceLines = [];
     let barSpacing = 9;
-    let rightOffset = 4;
+    let rightOffset = 22;
     let scrollOffset = 0;
     let hoverX = -1, hoverY = -1;
     let externalSyncX = null;
@@ -1257,12 +1364,12 @@ const LightweightCharts = (() => {
       if (rect.width <= 0 || rect.height <= 0) return;
       hoverX = e.clientX - rect.left;
       hoverY = e.clientY - rect.top;
-      if (isDragging && panEnabled) {
+            if (isDragging && panEnabled) {
         if ((e.buttons & 1) === 0) {
           isDragging = false;
         } else {
           const dx = e.clientX - dragStartX;
-          scrollOffset = Math.max(-5, Math.min(bars.length - 2, dragStartScroll + dx / barSpacing));
+          scrollOffset = Math.max(-60, Math.min(Math.max(0, bars.length - 5), dragStartScroll + dx / barSpacing));
         }
       }
       const inBounds = hoverX >= 0 && hoverX <= getPlotWidth() && hoverY >= 0 && hoverY <= getPlotHeight();
@@ -1551,8 +1658,8 @@ const LightweightCharts = (() => {
         bars = data;
         if (!preserveScroll) {
           scrollOffset = 0;
-        } else if (prevLen > 0 && data.length > 0) {
-          scrollOffset = Math.max(-5, Math.min(data.length - 2, scrollOffset * (data.length / prevLen)));
+        } else if (prevLen > 0 && data.length > prevLen && scrollOffset > 0) {
+          scrollOffset += data.length - prevLen;
         }
       },
       update(bar) {
@@ -1597,6 +1704,7 @@ const LightweightCharts = (() => {
       addCandlestickSeries: () => seriesApi,
       addLineSeries,
       removeSeries,
+      setRightOffset: (offsetBars) => { rightOffset = Math.max(4, Number(offsetBars) || 22); },
       setPanEnabled: (enabled) => { panEnabled = enabled; if (!enabled) isDragging = false; },
       setShowSessions: (flag) => { showSessions = !!flag; },
       setPricePrecision: (dec) => { pricePrecision = Math.max(0, Math.min(8, Number(dec) || 2)); },
@@ -1635,6 +1743,9 @@ const state = {
   baseInterval: 60,
   datasetId: 'demo',
   isCustomCsv: false,
+  cutModeActive: false,
+  cutHoverX: -1,
+  cutHoverBar: null,
   replayIndex: -1,
   tickSimEnabled: false,
   intraTickStage: 3, // 0..3 (3 = full bar closed)
@@ -1713,7 +1824,7 @@ function parseCSVRows(text, targetArray) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
-    const sep = line.includes(';') ? ';' : (line.includes('     ') ? '  ' : ',');
+    const sep = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
     const cols = line.split(sep).map(c => c.trim());
     if (cols.length < 5) continue;
 
@@ -2300,22 +2411,24 @@ function stepReplay() {
 function jumpToNextSessionUTC(targetHour) {
   if (!state.candles.length || state.replayIndex >= state.candles.length - 1) return;
   pauseReplay();
-  let stepped = false;
+  state.stopJump = false;
+  rebuildAggregatedBars(true);
   while (state.replayIndex < state.candles.length - 1) {
     const prevHr = new Date(state.candles[state.replayIndex].time * 1000).getUTCHours();
     state.replayIndex++;
     state.intraTickStage = 3;
     const c = state.candles[state.replayIndex];
     const curHr = new Date(c.time * 1000).getUTCHours();
+    appendIncrementalCandle(c);
+    const tradesBefore = state.trades.length;
     evaluateOrdersAndPositionsOnCandle(c);
-    stepped = true;
+    if (state.stopJump || state.trades.length !== tradesBefore) break;
     if (curHr === targetHour && prevHr !== targetHour) break;
   }
-  if (stepped) {
-    rebuildAggregatedBars(false);
-    updateStatusUI();
-    updatePaperTradingUI();
-  }
+  state.stopJump = false;
+  rebuildAggregatedBars(false);
+  updateStatusUI();
+  updatePaperTradingUI();
 }
 
 function stepReplayBack() {
@@ -2351,6 +2464,7 @@ function togglePlay() {
   } else {
     if (state.replayIndex >= state.candles.length - 1 && (!state.tickSimEnabled || state.intraTickStage >= 3)) return;
     state.isPlaying = true;
+    if (state.cutModeActive) setCutMode(false);
     lastPlayTime = 0;
     document.getElementById('btn-play').textContent = 'Pause';
     document.getElementById('btn-play').classList.add('active');
@@ -2563,7 +2677,7 @@ let orderSeqId = 1;
 function getQuoteToUsdRate(symbol, currentPrice) {
   if (!currentPrice || currentPrice <= 0) return 1;
   if (symbol === 'USDCAD') return 1 / currentPrice;
-  if (symbol === 'GBPJPY') return 100 / currentPrice;
+  if (symbol === 'GBPJPY') return 1 / (Number(window.USDJPY_RATE) || 150); // approx USDJPY; set window.USDJPY_RATE to change
   return 1;
 }
 
@@ -2908,7 +3022,7 @@ function openMarketPosition(side) {
   const commission = Number((lots * commPerLot).toFixed(2));
 
   state.positions.push({
-    id: orderSeqId++, symbol: state.symbol, side, entry, entryTime: c.time,
+    id: orderSeqId++, symbol: state.symbol, side, entry, entryTime: c.time, slInit: sl,
     sl, tp1, tp1Pct, autoBe, tp1Hit: false, tp, lots, contractSize, spreadPrice, commission, setupTag: tag, tag
   });
 
@@ -3016,7 +3130,7 @@ function partialClosePosition(id, fraction = 0.5, overrideExitPrice = null, reas
 
   let rMult = null;
   if (p.sl !== null) {
-    const initialRisk = Math.abs(p.entry - p.sl) * closeLots * p.contractSize * qRate + closedComm;
+    const initialRisk = Math.abs(p.entry - (p.slInit ?? p.sl)) * closeLots * p.contractSize * qRate + closedComm;
     if (initialRisk > 0) rMult = netPnl / initialRisk;
   }
 
@@ -3168,7 +3282,7 @@ function closePositionById(id, exitPrice, exitTime, reason = 'Manual') {
 
   let rMult = null;
   if (p.sl !== null) {
-    const initialRisk = Math.abs(p.entry - p.sl) * p.lots * p.contractSize * qRate + p.commission;
+    const initialRisk = Math.abs(p.entry - (p.slInit ?? p.sl)) * p.lots * p.contractSize * qRate + p.commission;
     if (initialRisk > 0) rMult = netPnl / initialRisk;
   }
 
@@ -3227,7 +3341,7 @@ function evaluateOrdersAndPositionsOnCandle(candle) {
       linesChanged = true;
       state.positions.push({
         id: o.id, symbol: o.symbol || state.symbol, side: o.side, entry: o.triggerPrice,
-        entryTime: candle.time, sl: o.sl, tp1: o.tp1, tp1Pct: o.tp1Pct, autoBe: o.autoBe, tp1Hit: false,
+        entryTime: candle.time, sl: o.sl, slInit: o.sl, tp1: o.tp1, tp1Pct: o.tp1Pct, autoBe: o.autoBe, tp1Hit: false,
         tp: o.tp, lots: o.lots, contractSize: o.contractSize, spreadPrice: o.spreadPrice, commission: o.commission,
         setupTag: o.setupTag || o.tag, tag: `${o.tag} [${o.orderType.replace('_', ' ')}]`
       });
@@ -3316,6 +3430,39 @@ function aggregateTradesBy(trades, keyFn, fixedOrder = null) {
   return rows;
 }
 
+let analyticsTagFilter = new Set();
+let analyticsMatchAll = true;
+
+const escHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function getTradeTags(t) {
+  const raw = t.setupTag || extractCleanSetup(t.tag);
+  const parts = String(raw).split('+').map(s => s.trim()).filter(Boolean);
+  return parts.length ? parts : ['Untagged'];
+}
+
+function tradeMatchesTagFilter(t) {
+  if (!analyticsTagFilter.size) return true;
+  const tags = getTradeTags(t);
+  const sel = [...analyticsTagFilter];
+  return analyticsMatchAll ? sel.every(s => tags.includes(s)) : sel.some(s => tags.includes(s));
+}
+
+function aggregateByTag(trades) {
+  const map = new Map();
+  for (const t of trades) {
+    for (const tag of getTradeTags(t)) {
+      if (!map.has(tag)) map.set(tag, { key: tag, count: 0, wins: 0, netPnl: 0, rSum: 0, rCount: 0 });
+      const r = map.get(tag);
+      r.count++;
+      if (t.pnl > 0) r.wins++;
+      r.netPnl += t.pnl;
+      if (t.rMult !== null && t.rMult !== undefined) { r.rSum += t.rMult; r.rCount++; }
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.netPnl - a.netPnl);
+}
+
 function renderBreakdownTables() {
   const container = document.getElementById('breakdown-container');
   if (!state.trades.length) {
@@ -3323,12 +3470,27 @@ function renderBreakdownTables() {
     return;
   }
 
-  const sessionOrder = ['Asia (00-07)', 'London (07-12)', 'NY Overlap (12-16)', 'New York (16-21)', 'Late / Roll (21-00)'];
-  const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // Tag chips always show every tag across ALL trades
+  const tagCount = new Map();
+  for (const t of state.trades) for (const tag of getTradeTags(t)) tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
+  for (const s of [...analyticsTagFilter]) if (!tagCount.has(s)) analyticsTagFilter.delete(s);
 
-  const bySession = aggregateTradesBy(state.trades, t => getTradingSessionUTC(t.entryTime), sessionOrder);
-  const byDay = aggregateTradesBy(state.trades, t => getWeekdayUTC(t.entryTime), dayOrder);
-  const bySetup = aggregateTradesBy(state.trades, t => t.setupTag || extractCleanSetup(t.tag), null);
+  const trades = state.trades.filter(tradeMatchesTagFilter);
+
+  const chipsHtml = [...tagCount.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag, n]) =>
+      `<span class="tag-chip ${analyticsTagFilter.has(tag) ? 'active' : ''}" data-ftag="${escHtml(tag)}">${escHtml(tag)} <b>${n}</b></span>`
+    ).join('');
+
+  const filterBar = `
+    <div class="bk-group-title">Filter by Setup Tag</div>
+    <div class="tag-chips" id="bk-tag-chips">${chipsHtml}</div>
+    <div style="display:flex;gap:6px;align-items:center;margin:7px 0 4px;">
+      <button id="bk-mode" style="padding:2px 8px;font-size:10px;">Match: ${analyticsMatchAll ? 'ALL' : 'ANY'}</button>
+      <button id="bk-clear" style="padding:2px 8px;font-size:10px;" ${analyticsTagFilter.size ? '' : 'disabled'}>Clear</button>
+      <span style="color:var(--text-muted);font-size:10px;">${trades.length} / ${state.trades.length} trades</span>
+    </div>`;
 
   function buildTableHTML(title, labelHeader, rows) {
     const trs = rows.map(r => {
@@ -3338,28 +3500,70 @@ function renderBreakdownTables() {
       const pnlStr = `${r.netPnl >= 0 ? '+' : ''}$${r.netPnl.toFixed(2)}`;
       return `
         <tr>
-          <td style="max-width:115px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.key}"><b>${r.key}</b></td>
-          <td>${r.count}</td>
-          <td>${wr}</td>
-          <td>${avgR}</td>
-          <td class="${pnlCls}">${pnlStr}</td>
-        </tr>
-      `;
+          <td style="max-width:115px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(r.key)}"><b>${escHtml(r.key)}</b></td>
+          <td>${r.count}</td><td>${wr}</td><td>${avgR}</td><td class="${pnlCls}">${pnlStr}</td>
+        </tr>`;
     }).join('');
-
     return `
       <div class="bk-group-title">${title}</div>
       <table>
         <thead><tr><th>${labelHeader}</th><th>#</th><th>Win%</th><th>Avg R</th><th>Net P&amp;L</th></tr></thead>
         <tbody>${trs}</tbody>
-      </table>
-    `;
+      </table>`;
   }
 
-  container.innerHTML =
-    buildTableHTML('By Trading Session (UTC)', 'Session', bySession) +
-    buildTableHTML('By Weekday (UTC)', 'Day', byDay) +
-    buildTableHTML('By Setup Tag', 'Setup', bySetup);
+  let body = '';
+  if (!trades.length) {
+    body = '<div style="color:var(--text-muted);font-size:11px;padding:8px 0;">No trades match this tag filter.</div>';
+  } else {
+    let wins = 0, gW = 0, gL = 0, net = 0, rS = 0, rC = 0;
+    for (const t of trades) {
+      net += t.pnl;
+      if (t.pnl > 0) { wins++; gW += t.pnl; } else if (t.pnl < 0) { gL -= t.pnl; }
+      if (t.rMult !== null && t.rMult !== undefined) { rS += t.rMult; rC++; }
+    }
+    const pf = gL > 0 ? (gW / gL).toFixed(2) : (gW > 0 ? '∞' : '0.00');
+    const netCls = net >= 0 ? 'bull-txt' : 'bear-txt';
+    const box = (label, val, cls = '') =>
+      `<div class="stat-box"><div class="stat-label">${label}</div><div class="stat-val ${cls}">${val}</div></div>`;
+
+    const summary = `
+      <div class="stat-grid" style="margin:6px 0 4px;">
+        ${box('Trades', trades.length)}
+        ${box('Win Rate', ((wins / trades.length) * 100).toFixed(1) + '%')}
+        ${box('Avg R', (rC ? (rS / rC).toFixed(2) : '0.00') + 'R')}
+        ${box('Profit Factor', pf)}
+        ${box('Net P&L', `${net >= 0 ? '+' : ''}$${net.toFixed(0)}`, netCls)}
+        ${box('Avg / Trade', `${net >= 0 ? '+' : ''}$${(net / trades.length).toFixed(0)}`, netCls)}
+      </div>`;
+
+    const sessionOrder = ['Asia (00-07)', 'London (07-12)', 'NY Overlap (12-16)', 'New York (16-21)', 'Late / Roll (21-00)'];
+    const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    body = summary +
+      buildTableHTML('By Trading Session (UTC)', 'Session', aggregateTradesBy(trades, t => getTradingSessionUTC(t.entryTime), sessionOrder)) +
+      buildTableHTML('By Weekday (UTC)', 'Day', aggregateTradesBy(trades, t => getWeekdayUTC(t.entryTime), dayOrder)) +
+      buildTableHTML('By Setup Combo', 'Setup', aggregateTradesBy(trades, t => t.setupTag || extractCleanSetup(t.tag), null)) +
+      buildTableHTML('By Individual Tag', 'Tag', aggregateByTag(trades));
+  }
+
+  container.innerHTML = filterBar + body;
+
+  container.querySelectorAll('[data-ftag]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const tag = chip.dataset.ftag;
+      if (analyticsTagFilter.has(tag)) analyticsTagFilter.delete(tag); else analyticsTagFilter.add(tag);
+      renderBreakdownTables();
+    });
+  });
+  container.querySelector('#bk-mode').addEventListener('click', () => {
+    analyticsMatchAll = !analyticsMatchAll;
+    renderBreakdownTables();
+  });
+  container.querySelector('#bk-clear').addEventListener('click', () => {
+    analyticsTagFilter.clear();
+    renderBreakdownTables();
+  });
 }
 
 function exportJournalCSV() {
@@ -3494,7 +3698,7 @@ function updatePaperTradingUI() {
         <button data-cancel-id="${o.id}" class="btn-danger" style="padding:2px 6px;font-size:10px;">Cancel</button>
       </div>
       <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">
-        SL: ${oFmt(o.sl)} | TP2: ${oFmt(o.tp)} | ${o.tag}
+        SL: ${oFmt(o.sl)} | TP2: ${oFmt(o.tp)} | ${escHtml(o.tag)}
       </div>
     `;
     card.querySelector('[data-cancel-id]').addEventListener('click', () => cancelPendingOrder(o.id));
@@ -3540,7 +3744,7 @@ function updatePaperTradingUI() {
       <td class="${t.side === 'LONG' ? 'bull-txt' : 'bear-txt'}"><b>${t.side}</b></td>
       <td class="${cls}">${t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
       <td>${t.rMult !== null ? t.rMult.toFixed(2) + 'R' : '-'}</td>
-      <td style="max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${snapBtnHtml}${t.tag}</td>
+      <td style="max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${snapBtnHtml}${escHtml(t.tag)}</td>
     `;
     const snapBtn = tr.querySelector('.btn-snap-view');
     if (snapBtn) {
@@ -3576,7 +3780,7 @@ function renderSnapshotGallery() {
     const cls = t.pnl >= 0 ? 'bull-txt' : 'bear-txt';
     const rStr = t.rMult !== null && t.rMult !== undefined ? `${t.rMult >= 0 ? '+' : ''}${t.rMult.toFixed(1)}R` : '';
     card.innerHTML = `
-      <img src="${t.snapshot}" alt="${t.tag}" loading="lazy" />
+      <img src="${t.snapshot}" alt="${escHtml(t.tag)}" loading="lazy" />
       <div class="snap-card-meta">
         <span class="${cls}"><b>${t.side}</b> ${t.pnl >= 0 ? '+' : ''}$${t.pnl.toFixed(0)}</span>
         <span style="color:var(--text-muted);">${rStr}</span>
@@ -4115,6 +4319,37 @@ function renderDrawings() {
   octx.rect(0, 0, plotW, plotH);
   octx.clip();
 
+  // Interactive Cut Mode Vertical Scissor Guide
+  if (state.cutModeActive && state.cutHoverX >= 0 && state.cutHoverX <= plotW) {
+    const cx = Math.round(state.cutHoverX) + 0.5;
+    octx.save();
+    octx.fillStyle = 'rgba(255, 152, 0, 0.12)';
+    octx.fillRect(cx, 0, plotW - cx, plotH);
+
+    octx.strokeStyle = '#ff9800';
+    octx.lineWidth = 2;
+    octx.setLineDash([5, 4]);
+    octx.beginPath();
+    octx.moveTo(cx, 0);
+    octx.lineTo(cx, plotH);
+    octx.stroke();
+    octx.setLineDash([]);
+
+    if (state.cutHoverBar) {
+      const cutIso = new Date(state.cutHoverBar.time * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+      const tag = `CLICK TO CUT @ ${cutIso}`;
+      octx.font = 'bold 10px monospace';
+      const tw = octx.measureText(tag).width + 12;
+      const bx = Math.max(6, Math.min(plotW - tw - 6, cx - tw / 2));
+      const by = 48;
+      octx.fillStyle = '#ff9800';
+      octx.fillRect(bx, by, tw, 18);
+      octx.fillStyle = '#131722';
+      octx.fillText(tag, bx + 6, by + 13);
+    }
+    octx.restore();
+  }
+
   renderAutoSmcOverlay(octx, plotW, plotH);
 
   const selD = state.drawings[state.selectedDrawingIdx];
@@ -4182,7 +4417,7 @@ function renderDrawings() {
         const yH = series.priceToCoordinate(cd.high);
         const yL = series.priceToCoordinate(cd.low);
         const isBull = cd.close >= cd.open;
-        const col = isBull ? '#26a69a' : '#ef5350';
+        const col = cd.color || (isBull ? '#26a69a' : '#ef5350');
 
         octx.save();
         octx.globalAlpha = isDraft ? 0.82 : 0.94;
@@ -4196,8 +4431,10 @@ function renderDrawings() {
         const bH = Math.max(2, Math.abs(yC - yO));
         octx.fillRect(Math.round(cx - bodyW / 2), Math.round(bTop), bodyW, Math.round(bH));
 
-        if (isSelected) {
-          octx.strokeStyle = '#ffffff'; octx.lineWidth = 1;
+          if (isSelected) {
+          const picked = cIdx === selectedCandleIdx;
+          octx.strokeStyle = picked ? '#ffffff' : 'rgba(255,255,255,0.35)';
+          octx.lineWidth = picked ? 2 : 1;
           octx.strokeRect(Math.round(cx - bodyW / 2) - 1, Math.round(bTop) - 1, bodyW + 2, Math.round(bH) + 2);
         }
         if (isHtfOverlay && cIdx === 0) {
@@ -4418,6 +4655,38 @@ function renderDrawings() {
   octx.restore();
 }
 
+let selectedCandleIdx = -1;
+
+function hitTestCandleIdx(d, mx, my) {
+  if (!d || d.kind !== 'candle_pen' || !d.candles) return -1;
+  const pxPerBar = Math.abs(chart.timeScale().logicalToCoordinate(1) - chart.timeScale().logicalToCoordinate(0)) || 9;
+  const half = Math.max(4, pxPerBar * 0.45);
+  for (let k = d.candles.length - 1; k >= 0; k--) {
+    const c = d.candles[k];
+    const cx = timeToX(c.time);
+    const yT = series.priceToCoordinate(c.high), yB = series.priceToCoordinate(c.low);
+    if (mx >= cx - half && mx <= cx + half && my >= Math.min(yT, yB) - 5 && my <= Math.max(yT, yB) + 5) return k;
+  }
+  return -1;
+}
+
+function removeLastCandleFromDrawing(idx) {
+  const d = state.drawings[idx];
+  if (!d || d.kind !== 'candle_pen' || !d.candles) return false;
+  pushDrawingHistory();
+  selectedCandleIdx = -1;
+  if (d.candles.length <= 1) {
+    state.drawings.splice(idx, 1);
+    state.selectedDrawingIdx = -1;
+  } else {
+    d.candles.pop();
+    d.points = d.candles.map(c => ({ time: c.time, price: c.close }));
+  }
+  saveToStorage(`tv_drawings_${state.datasetId}`, state.drawings);
+  return true;
+}
+
+
 let downX = 0, downY = 0, didDragEdit = false;
 
 chartWrapper.addEventListener('contextmenu', (e) => {
@@ -4425,10 +4694,20 @@ chartWrapper.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     state.draftDrawing = null;
     setActiveTool('cursor');
+    return;
+  }
+  const rect = chartWrapper.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const hit = hitTestDrawings(mx, my);
+  if (hit >= 0 && state.drawings[hit].kind === 'candle_pen') {
+    e.preventDefault();
+    state.selectedDrawingIdx = hit;
+    removeLastCandleFromDrawing(hit);
   }
 });
 
 chartWrapper.addEventListener('mousedown', (e) => {
+if (state.cutModeActive) return;
   if (e.button !== 0) return;
   if (e.target === rrSendBtn) return;
 
@@ -4471,6 +4750,7 @@ chartWrapper.addEventListener('mousedown', (e) => {
     if (hitIdx >= 0) {
       state.selectedDrawingIdx = hitIdx;
       const d = state.drawings[hitIdx];
+      selectedCandleIdx = d.kind === 'candle_pen' ? hitTestCandleIdx(d, mx, my) : -1;
       if (d.color) document.getElementById('draw-color').value = d.color;
       state.dragEdit = {
         drawingIdx: hitIdx, mode: 'move', handleIdx: -1,
@@ -4487,16 +4767,20 @@ chartWrapper.addEventListener('mousedown', (e) => {
     const color = document.getElementById('draw-color').value;
     state.draftDrawing = { kind: 'pen', originTf: state.currentTf, points: [pt], color };
     chart.setPanEnabled(false);
-  } else if (state.activeTool === 'candle_pen') {
+    } else if (state.activeTool === 'candle_pen') {
     const pt = getSnappedPoint(mx, my);
     const tfSec = TF_SECONDS[state.currentTf] || TF_SECONDS.M15;
     const startBucket = getBucketTime(pt.time, state.currentTf);
-    const { unitSize } = getExecutionParams();
-    const initWick = unitSize * 6;
+    // minimal default wick = ~4px worth of price at the current zoom
+    const minWick = Math.abs(series.coordinateToPrice(my) - series.coordinateToPrice(my + 4));
     state.draftDrawing = {
-      kind: 'candle_pen', originTf: state.currentTf, tfSec,
+      kind: 'candle_pen', originTf: state.currentTf, tfSec, minWick,
       points: [{ time: startBucket, price: pt.price }],
-      candles: [{ time: startBucket, open: pt.price, high: pt.price + initWick, low: pt.price - initWick, close: pt.price }],
+      candles: [{
+        time: startBucket, open: pt.price, close: pt.price,
+        high: pt.price + minWick, low: pt.price - minWick,
+        ph: pt.price, pl: pt.price   // highest / lowest price your mouse reached in this candle
+      }],
       color: '#26a69a'
     };
     chart.setPanEnabled(false);
@@ -4609,10 +4893,11 @@ chartWrapper.addEventListener('mousemove', (e) => {
       const dPrice = curPrice - edit.startPrice;
 
       d.points = edit.origPoints.map(op => ({ time: logicalToTime(op.logical + dLogical), price: op.price + dPrice }));
-      if (d.kind === 'candle_pen' && edit.origCandles) {
+            if (d.kind === 'candle_pen' && edit.origCandles) {
         d.candles = edit.origCandles.map(oc => ({
           time: logicalToTime(oc.logical + dLogical),
-          open: oc.open + dPrice, high: oc.high + dPrice, low: oc.low + dPrice, close: oc.close + dPrice
+          open: oc.open + dPrice, high: oc.high + dPrice, low: oc.low + dPrice, close: oc.close + dPrice,
+          ...(oc.color ? { color: oc.color } : {})
         }));
       }
     }
@@ -4640,34 +4925,40 @@ chartWrapper.addEventListener('mousemove', (e) => {
       if (!last || Math.hypot(timeToX(last.time) - mx, series.priceToCoordinate(last.price) - my) >= 2.5) pts.push(pt);
       return;
     }
-    if (state.draftDrawing.kind === 'candle_pen') {
+        if (state.draftDrawing.kind === 'candle_pen') {
       const d = state.draftDrawing;
       const tfSec = d.tfSec;
+      const minWick = d.minWick || (getExecutionParams().unitSize * 4);
       const curBucket = getBucketTime(pt.time, d.originTf);
       const candles = d.candles;
       const lastC = candles[candles.length - 1];
+
+      // wick follows the mouse path, but never smaller than the minimal wick
+      const refit = (c) => {
+        const bodyTop = Math.max(c.open, c.close);
+        const bodyBot = Math.min(c.open, c.close);
+        c.ph = Math.max(c.ph ?? bodyTop, bodyTop);
+        c.pl = Math.min(c.pl ?? bodyBot, bodyBot);
+        c.high = Math.max(c.ph, bodyTop + minWick);
+        c.low  = Math.min(c.pl, bodyBot - minWick);
+      };
 
       if (curBucket > lastC.time) {
         const steps = Math.min(80, Math.round((curBucket - lastC.time) / tfSec));
         const prevClose = lastC.close;
         for (let s = 1; s <= steps; s++) {
           const tStep = lastC.time + s * tfSec;
-          const frac = s / steps;
           const interpOpen = s === 1 ? prevClose : (prevClose + (pt.price - prevClose) * ((s - 1) / steps));
-          const interpClose = prevClose + (pt.price - prevClose) * frac;
-          const bodySpan = Math.abs(interpClose - interpOpen);
-          const wickPad = Math.max(bodySpan * 0.22, getExecutionParams().unitSize * 3);
-          candles.push({
-            time: tStep, open: interpOpen,
-            high: Math.max(interpOpen, interpClose) + wickPad * 0.65,
-            low: Math.min(interpOpen, interpClose) - wickPad * 0.65,
-            close: interpClose
-          });
+          const interpClose = prevClose + (pt.price - prevClose) * (s / steps);
+          const nc = { time: tStep, open: interpOpen, close: interpClose };
+          refit(nc);
+          candles.push(nc);
         }
       } else if (curBucket === lastC.time) {
         lastC.close = pt.price;
-        if (pt.price > lastC.high) lastC.high = pt.price;
-        if (pt.price < lastC.low) lastC.low = pt.price;
+        lastC.ph = Math.max(lastC.ph ?? pt.price, pt.price);
+        lastC.pl = Math.min(lastC.pl ?? pt.price, pt.price);
+        refit(lastC);
       }
       return;
     }
@@ -4742,6 +5033,7 @@ chartWrapper.addEventListener('mouseup', (e) => {
   if (tool === 'cursor') {
     const hit = hitTestDrawings(mx, my);
     state.selectedDrawingIdx = hit;
+    selectedCandleIdx = (hit >= 0 && state.drawings[hit].kind === 'candle_pen') ? hitTestCandleIdx(state.drawings[hit], mx, my) : -1;
     if (hit >= 0 && state.drawings[hit].color) {
       document.getElementById('draw-color').value = state.drawings[hit].color;
     }
@@ -4841,8 +5133,16 @@ chartWrapper.addEventListener('dblclick', (e) => {
   }
   const rect = chartWrapper.getBoundingClientRect();
   const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
+    const my = e.clientY - rect.top;
   const hit = hitTestDrawings(mx, my);
+  if (hit >= 0 && state.drawings[hit].kind === 'candle_pen') {
+    const ci = hitTestCandleIdx(state.drawings[hit], mx, my);
+    if (ci >= 0) {
+      delete state.drawings[hit].candles[ci].color;
+      saveToStorage(`tv_drawings_${state.datasetId}`, state.drawings);
+      return;
+    }
+  }
   if (hit >= 0 && state.drawings[hit].kind === 'text') {
     e.preventDefault();
     const d = state.drawings[hit];
@@ -5128,7 +5428,13 @@ window.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toUpperCase();
   const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
+  
+
   if (e.key === 'Escape') {
+    if (state.cutModeActive) {
+  setCutMode(false);
+  return;
+}
     if (leftMoreMenu.classList.contains('open')) {
       leftMoreMenu.classList.remove('open');
       btnLeftMore.classList.remove('active');
@@ -5153,6 +5459,8 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (isTyping) return;
+
+  if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.toLowerCase() === 'c') { e.preventDefault(); setCutMode(!state.cutModeActive); return; }
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
     e.preventDefault();
@@ -5245,6 +5553,8 @@ window.addEventListener('keydown', (e) => {
 
   if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedDrawingIdx >= 0) {
     e.preventDefault();
+       const selD = state.drawings[state.selectedDrawingIdx];
+    if (selD && selD.kind === 'candle_pen' && !e.shiftKey) { removeLastCandleFromDrawing(state.selectedDrawingIdx); return; }
     pushDrawingHistory();
     state.drawings.splice(state.selectedDrawingIdx, 1);
     state.selectedDrawingIdx = -1;
@@ -5259,7 +5569,7 @@ document.getElementById('csv-input').addEventListener('change', async (e) => {
   if (!files.length) return;
 
   const btnLoad = document.getElementById('btn-load-csv');
-  btnLoad.textContent = `Loading ${files.length} file(s)...`;
+  btnLoad.textContent = '...';
   btnLoad.disabled = true;
 
   try {
@@ -5287,7 +5597,7 @@ document.getElementById('csv-input').addEventListener('change', async (e) => {
     await SadatiaIDB.saveDataset({ candles: merged, symbol: detectedSym || state.symbol, datasetId: dsId });
     loadDataset(merged, dsId, true);
   } finally {
-    btnLoad.textContent = 'Load CSV(s)';
+    btnLoad.textContent = 'CSV';
     btnLoad.disabled = false;
     e.target.value = '';
   }
@@ -5368,10 +5678,15 @@ document.getElementById('btn-tf-inherit').addEventListener('click', (e) => {
 document.getElementById('btn-snap').addEventListener('click', toggleSnapMagnet);
 
 document.getElementById('draw-color').addEventListener('input', (e) => {
-  if (state.selectedDrawingIdx >= 0 && state.drawings[state.selectedDrawingIdx]) {
-    state.drawings[state.selectedDrawingIdx].color = e.target.value;
-    saveToStorage(`tv_drawings_${state.datasetId}`, state.drawings);
+  const d = state.drawings[state.selectedDrawingIdx];
+  if (!d) return;
+  if (d.kind === 'candle_pen' && d.candles) {
+    if (selectedCandleIdx >= 0 && d.candles[selectedCandleIdx]) d.candles[selectedCandleIdx].color = e.target.value;
+    else d.candles.forEach(c => { c.color = e.target.value; });
+  } else {
+    d.color = e.target.value;
   }
+  saveToStorage(`tv_drawings_${state.datasetId}`, state.drawings);
 });
 
 document.getElementById('btn-undo-draw').addEventListener('click', undoDrawing);
@@ -5479,6 +5794,52 @@ btnResetJournal.addEventListener('click', () => {
   }
 });
 
+// Right Panel Collapse / Expand + Canvas Reflow
+const rightPanel = document.querySelector('.panel-right');
+const btnToggleRightPanel = document.getElementById('btn-toggle-right-panel');
+const STORAGE_RIGHT_PANEL_KEY = 'tv_offline_right_panel_v1';
+
+function setRightPanelVisible(visible) {
+  rightPanel.classList.toggle('collapsed', !visible);
+  btnToggleRightPanel.classList.toggle('active', visible);
+  btnToggleRightPanel.innerHTML = visible ? '&raquo;' : '&laquo;';
+  saveToStorage(STORAGE_RIGHT_PANEL_KEY, visible);
+  requestAnimationFrame(() => {
+    if (state.htfSplitOpen) htfChart.resize();
+    chart.resize();
+  });
+}
+
+btnToggleRightPanel.addEventListener('click', () => {
+  const isCurrentlyVisible = !rightPanel.classList.contains('collapsed');
+  setRightPanelVisible(!isCurrentlyVisible);
+});
+
+// Future Projection Space Toggle (+Space)
+const btnFutureSpace = document.getElementById('btn-future-space');
+let expandedFutureSpace = true;
+function toggleFutureSpace() {
+  expandedFutureSpace = !expandedFutureSpace;
+  chart.setRightOffset(expandedFutureSpace ? 22 : 5);
+  htfChart.setRightOffset(expandedFutureSpace ? 10 : 4);
+  chart.timeScale().scrollToRealTime();
+  btnFutureSpace.classList.toggle('active', expandedFutureSpace);
+}
+btnFutureSpace.addEventListener('click', toggleFutureSpace);
+
+// Add Alt+R (Right Panel) and Alt+F (Future Space) hotkeys
+window.addEventListener('keydown', (e) => {
+  const tag = (e.target.tagName || '').toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.altKey && e.key.toLowerCase() === 'r') {
+    e.preventDefault();
+    setRightPanelVisible(rightPanel.classList.contains('collapsed'));
+  } else if (e.altKey && e.key.toLowerCase() === 'f') {
+    e.preventDefault();
+    toggleFutureSpace();
+  }
+});
+
 // Unified Render Loop
 function frameLoop() {
   if (state.htfSplitOpen) htfChart.render();
@@ -5487,8 +5848,71 @@ function frameLoop() {
   requestAnimationFrame(frameLoop);
 }
 
+// ---------- Tool icon set (inline SVG) ----------
+const ICONS = {
+  cursor:    '<path d="M5 3l13 8-6 1.5L9.5 19z"/>',
+    long_rr:  '<rect x="3" y="3" width="18" height="10" rx="1" fill="#26a69a" fill-opacity=".35" stroke="#26a69a" stroke-width="1.6"/><rect x="3" y="13" width="18" height="6" rx="1" fill="#ef5350" fill-opacity=".35" stroke="#ef5350" stroke-width="1.6"/><path d="M3 13h18" stroke="#ffffff" stroke-width="2"/><path d="M12 10V6M10 8l2-2 2 2" stroke="#ffffff" stroke-width="1.6"/>',
+  short_rr: '<rect x="3" y="5" width="18" height="6" rx="1" fill="#ef5350" fill-opacity=".35" stroke="#ef5350" stroke-width="1.6"/><rect x="3" y="11" width="18" height="10" rx="1" fill="#26a69a" fill-opacity=".35" stroke="#26a69a" stroke-width="1.6"/><path d="M3 11h18" stroke="#ffffff" stroke-width="2"/><path d="M12 14v4M10 16l2 2 2-2" stroke="#ffffff" stroke-width="1.6"/>',
+  hline:     '<path d="M3 12h18"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+  vline:     '<path d="M12 3v18"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+  trend:     '<path d="M6 18L18 6"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="5.5" r="2"/>',
+  ray:       '<circle cx="5.5" cy="17.5" r="2"/><path d="M7.5 15.5L20 5"/><path d="M15 5h5v5"/>',
+  box:       '<rect x="4" y="6" width="16" height="12" rx="1" fill="currentColor" fill-opacity=".18"/>',
+  fib:       '<path d="M3 5h18M3 9.5h18M3 14h18M3 19h18"/><path d="M7 19L17 5" stroke-dasharray="2 2"/>',
+  path:      '<polyline points="3,18 9,8 14,14 21,5"/><circle cx="3" cy="18" r="1.4" fill="currentColor"/><circle cx="9" cy="8" r="1.4" fill="currentColor"/><circle cx="14" cy="14" r="1.4" fill="currentColor"/><circle cx="21" cy="5" r="1.4" fill="currentColor"/>',
+  pen:       '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  candle_pen:'<path d="M8 3v3M8 16v3"/><rect x="5.5" y="6" width="5" height="10" fill="#26a69a" fill-opacity=".4" stroke="#26a69a"/><path d="M17 9v2M17 19v2"/><rect x="14.5" y="11" width="5" height="8" fill="#ef5350" fill-opacity=".4" stroke="#ef5350"/>',
+  text:      '<path d="M5 7V5h14v2M12 5v14M9 19h6"/>'
+};
+const BTN_ICONS = {
+  '#btn-tf-inherit': '<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
+  '#btn-snap':       '<path d="M6 4v8a6 6 0 0 0 12 0V4h-4v8a2 2 0 0 1-4 0V4z"/><path d="M6 8h4M14 8h4"/>',
+  '#btn-undo-draw':  '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/>',
+  '#btn-redo-draw':  '<path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/>',
+  '#btn-del-draw':   '<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',
+  '#btn-clear-draw': '<circle cx="12" cy="12" r="8"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/>',
+  '#btn-left-more':  '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>'
+};
+const DOCK_ICONS = {
+  fvg: '<path d="M4 4v5M4 15v5M20 4v5M20 15v5"/><rect x="4" y="9" width="16" height="6" fill="currentColor" fill-opacity=".3"/><path d="M4 12h16" stroke-dasharray="2.5 2"/>',
+  ob:  '<rect x="4" y="5" width="16" height="14" rx="1" fill="currentColor" fill-opacity=".25"/><path d="M12 8v8"/><rect x="10" y="10" width="4" height="4" fill="currentColor"/>',
+  mb:  '<rect x="4" y="8" width="16" height="9" rx="1" fill="currentColor" fill-opacity=".25" stroke-dasharray="3 2"/><path d="M12 3v6M10 7l2 2 2-2"/>',
+  bos: '<path d="M3 14h18" stroke-dasharray="3 2.5"/><polyline points="4,20 9,13 13,17 20,6"/><path d="M16 6h4v4"/>',
+  sweep_mss: '<path d="M3 9h18" stroke-dasharray="3 2.5"/><polyline points="4,18 9,5 13,12 20,19"/><path d="M16 19h4v-4"/>'
+};
+function applyDockIcons() {
+  document.querySelectorAll('.tool-btn-dock[data-tool]').forEach(b => {
+    const key = b.dataset.tool;
+    if (!DOCK_ICONS[key] || b.dataset.iconed) return;
+    const label = b.textContent.trim();
+    b.innerHTML = svgWrap(DOCK_ICONS[key], 16, 2) + `<span>${label}</span>`;
+    b.dataset.iconed = '1';
+  });
+}
+applyDockIcons();
+
+function svgWrap(inner, size = 20, sw = 2.2) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0">${inner}</svg>`;
+}
+function applyToolIcons() {
+  document.querySelectorAll('.toolbar-left .tool-btn[data-tool]').forEach(b => {
+    if (ICONS[b.dataset.tool]) b.innerHTML = svgWrap(ICONS[b.dataset.tool]);
+  });
+  for (const [sel, inner] of Object.entries(BTN_ICONS)) {
+    const el = document.querySelector(sel);
+    if (el) el.innerHTML = svgWrap(inner);
+  }
+}
+applyToolIcons();
+
+
 // Boot Initialization (Async IndexedDB Hydration + Fallback)
 (async function initApp() {
+  await SadatiaIDB.init();
+
+  const savedRightPanel = loadFromStorage(STORAGE_RIGHT_PANEL_KEY, true);
+  setRightPanelVisible(savedRightPanel !== false);
+
   const savedExec = loadFromStorage(STORAGE_EXEC_KEY, null);
   if (savedExec) {
     setActiveSymbolProfile(savedExec.symbol || 'XAUUSD', true);
@@ -5514,15 +5938,17 @@ function frameLoop() {
   htfChart.setShowSessions(state.showSessions);
   document.getElementById('btn-sessions').classList.toggle('active', state.showSessions);
 
+  const FORCE_OFF_ON_LOAD = false; // true = HTF Split / PDH-PWH / EMA-SMA always start OFF
   const savedHtf = loadFromStorage(STORAGE_HTF_CFG_KEY, null);
-  if (savedHtf) {
-    if (savedHtf.htfTf && TF_SECONDS[savedHtf.htfTf]) state.htfTf = savedHtf.htfTf;
-    if (typeof savedHtf.htfSplitOpen === 'boolean') state.htfSplitOpen = savedHtf.htfSplitOpen;
-    if (typeof savedHtf.showHtfLevels === 'boolean') state.showHtfLevels = savedHtf.showHtfLevels;
-    if (typeof savedHtf.showAutoSmc === 'boolean') state.showAutoSmc = savedHtf.showAutoSmc;
-    if (typeof savedHtf.tfInherit === 'boolean') state.tfInherit = savedHtf.tfInherit;
+  const cfgHtf = FORCE_OFF_ON_LOAD ? null : savedHtf;
+  if (savedHtf && savedHtf.htfTf && TF_SECONDS[savedHtf.htfTf]) {
+    state.htfTf = savedHtf.htfTf;
+    document.getElementById('htf-tf-select').value = savedHtf.htfTf;
   }
-  document.getElementById('htf-tf-select').value = state.htfTf;
+  state.htfSplitOpen = cfgHtf?.htfSplitOpen === true;
+  state.showHtfLevels = cfgHtf?.showHtfLevels === true;
+  state.showAutoSmc = cfgHtf?.showAutoSmc === true;
+  state.tfInherit = savedHtf?.tfInherit !== false;
   document.getElementById('htf-wrapper').classList.toggle('hidden', !state.htfSplitOpen);
   document.getElementById('split-resizer').classList.toggle('hidden', !state.htfSplitOpen);
   document.getElementById('btn-htf-split').classList.toggle('active', state.htfSplitOpen);
@@ -5530,135 +5956,347 @@ function frameLoop() {
   document.getElementById('btn-auto-smc').classList.toggle('active', state.showAutoSmc);
   document.getElementById('btn-tf-inherit').classList.toggle('active', state.tfInherit);
 
-  // Hydrate Trades from IndexedDB first, fallback to localStorage
-  const idbTrades = await SadatiaIDB.loadTrades();
-  if (Array.isArray(idbTrades)) {
-    state.trades = idbTrades;
-  } else {
-    state.trades = loadFromStorage(STORAGE_TRADES_KEY, []);
+
+  const savedInds = loadFromStorage(STORAGE_INDS_KEY, null);
+  if (!FORCE_OFF_ON_LOAD && Array.isArray(savedInds)) {
+    savedInds.forEach(c => addIndicator(c.type, c.period, c.color, c.visible !== false, true));
   }
 
-  // Hydrate Cached CSV Dataset from IndexedDB if present
+
+  const idbTrades = await SadatiaIDB.loadTrades();
+  const lsTrades = loadFromStorage(STORAGE_TRADES_KEY, []);
+  state.trades = (Array.isArray(idbTrades) && idbTrades.length) ? idbTrades : lsTrades;
+
+  applyOrderTypeUI();
+
   const cachedDs = await SadatiaIDB.loadDataset();
-  if (cachedDs && Array.isArray(cachedDs.candles) && cachedDs.candles.length > 0) {
-    if (cachedDs.symbol && INSTRUMENTS[cachedDs.symbol]) setActiveSymbolProfile(cachedDs.symbol, true);
-    loadDataset(cachedDs.candles, cachedDs.datasetId || 'Cached_CSV', true);
+  if (cachedDs && Array.isArray(cachedDs.candles) && cachedDs.candles.length) {
+    if (cachedDs.symbol && INSTRUMENTS[cachedDs.symbol]) {
+      setActiveSymbolProfile(cachedDs.symbol, true);
+    }
+    loadDataset(cachedDs.candles, cachedDs.datasetId || 'CACHED_CSV', true);
   } else {
     loadDataset(generateDemoSymbolData(state.symbol), `${state.symbol}_DEMO`, false);
   }
 
-  const savedInds = loadFromStorage(STORAGE_INDS_KEY, [
-    { type: 'EMA', period: 20, color: '#2962ff', visible: true },
-    { type: 'EMA', period: 50, color: '#ff9800', visible: true }
-  ]);
-  savedInds.forEach(c => addIndicator(c.type, c.period, c.color, c.visible, true));
-  saveIndicatorsConfig();
-
-  htfChart.resize();
-  chart.resize();
-  updatePaperTradingUI();
   requestAnimationFrame(frameLoop);
 })();
 </script>
-
 <script>
-(() => {
-  const sel = document.getElementById('server-data-select');
-  const btnLoad = document.getElementById('btn-load-server-data');
-  const btnRefresh = document.getElementById('btn-refresh-server-data');
-  if (!sel || !btnLoad) return;
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const lsGet=(k,f)=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let toastT=null;
+const toastEl=document.createElement('div');toastEl.id='sb-toast';document.body.appendChild(toastEl);
+function toast(m,ms=3500){toastEl.textContent=m;toastEl.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.style.display='none',ms)}
+const modal=document.createElement('div');modal.className='shortcut-modal';modal.style.width='460px';
+modal.innerHTML='<div class="section-title"><span id="sb-m-title"></span><button id="sb-m-x" style="padding:2px 7px">&times;</button></div><div id="sb-m-body"></div>';
+document.body.appendChild(modal);
+$('sb-m-x').onclick=()=>modal.classList.remove('open');
+function showModal(t,h){$('sb-m-title').textContent=t;$('sb-m-body').innerHTML=h;modal.classList.add('open')}
 
-  async function listDir(relPath = '') {
-    const res = await fetch('/data/' + relPath, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const entries = await res.json();
-    return Array.isArray(entries) ? entries : [];
+/* ---------- header buttons ---------- */
+const pill=document.querySelector('.status-pill');
+function hdrBtn(id,txt,title){const b=document.createElement('button');b.id=id;b.textContent=txt;b.title=title;pill.parentNode.insertBefore(b,pill);return b}
+const btnBlind=hdrBtn('btn-blind','Blind','Blind practice: hides prices (Alt+B)');
+const btnRules=hdrBtn('btn-rules','Rules','Risk guardrails');
+
+/* ---------- 2. BLIND MODE ---------- */
+['htf-wrapper','chart-wrapper'].forEach(id=>{const d=document.createElement('div');d.className='sb-cover';$(id).appendChild(d)});
+function setBlind(on){document.body.classList.toggle('blind',on);btnBlind.classList.toggle('active',on);lsSet('sb7_blind',on)}
+btnBlind.onclick=()=>setBlind(!document.body.classList.contains('blind'));
+setBlind(!!lsGet('sb7_blind',false));
+
+/* ---------- 5. GUARDRAILS ---------- */
+const RK='sb7_rules';
+const rules=Object.assign({lossPct:0,maxTrades:0,sessions:['Asia','London','NY']},lsGet(RK,{}));
+const dayOf=t=>Math.floor(t/86400);
+const sessOf=t=>{const h=new Date(t*1000).getUTCHours();return h<7?'Asia':h<12?'London':h<21?'NY':'Off'};
+btnRules.onclick=()=>{
+  showModal('Risk Guardrails (practice rules)',
+   '<div class="sb-row"><span>Daily loss limit (% of $10k start, 0=off)</span><input type="number" id="rl-loss" min="0" step="0.1" value="'+rules.lossPct+'"></div>'+
+   '<div class="sb-row"><span>Max trades per day (0=off)</span><input type="number" id="rl-max" min="0" value="'+rules.maxTrades+'"></div>'+
+   '<div class="sb-row"><span>Allowed sessions</span><span>'+['Asia','London','NY'].map(s=>'<label><input type="checkbox" class="rl-s" value="'+s+'" '+(rules.sessions.includes(s)?'checked':'')+'> '+s+'</label> ').join('')+'</span></div>'+
+   '<div style="color:var(--text-muted);font-size:10px;margin:6px 0">Breaking a rule asks for confirmation and auto-tags the trade "Broke rules".</div>'+
+   '<button id="rl-save" class="btn-primary">Save</button>');
+  $('rl-save').onclick=()=>{rules.lossPct=Math.max(0,+$('rl-loss').value||0);rules.maxTrades=Math.max(0,Math.floor(+$('rl-max').value||0));
+    rules.sessions=[...document.querySelectorAll('.rl-s:checked')].map(x=>x.value);lsSet(RK,rules);modal.classList.remove('open');toast('Rules saved')};
+};
+function violations(){
+  const c=getActiveEffectiveCandle();if(!c)return[];const d=dayOf(c.time),v=[];
+  if(rules.lossPct>0){const pnl=state.trades.filter(t=>dayOf(t.exitTime)===d).reduce((a,t)=>a+t.pnl,0);
+    if(pnl<=-START_BAL*rules.lossPct/100)v.push('daily loss limit hit ($'+pnl.toFixed(0)+')')}
+  if(rules.maxTrades>0){const s=new Set();state.trades.forEach(t=>{if(dayOf(t.entryTime)===d)s.add(t.entryTime+'_'+t.entry)});
+    state.positions.forEach(p=>{if(dayOf(p.entryTime)===d)s.add(p.entryTime+'_'+p.entry)});
+    if(s.size>=rules.maxTrades)v.push('max trades/day ('+rules.maxTrades+') reached')}
+  const ss=sessOf(c.time);if(rules.sessions.length&&!rules.sessions.includes(ss))v.push('outside allowed sessions ('+ss+')');
+  return v;
+}
+const _open=openMarketPosition;
+openMarketPosition=function(side){
+  const v=violations();
+  if(v.length&&!confirm('Rule warning: '+v.join('; ')+'.\nTake the trade anyway?'))return;
+  const n=state.positions.length;_open(side);
+  if(v.length&&state.positions.length>n)state.positions[state.positions.length-1].violation=v.join('; ');
+};
+const _close=closePositionById;
+closePositionById=function(id){const p=state.positions.find(x=>x.id===id);_close.apply(null,arguments);tagViolation(p)};
+const _part=partialClosePosition;
+partialClosePosition=function(id){const p=state.positions.find(x=>x.id===id);const n=state.trades.length;_part.apply(null,arguments);if(state.trades.length>n)tagViolation(p)};
+function tagViolation(p){if(p&&p.violation&&state.trades[0]&&!state.trades[0].mistake){state.trades[0].mistake='Broke rules';persistTradesDual()}}
+
+/* ---------- 4. MISTAKE TAGS + RATING (journal) ---------- */
+const MISTAKES=['','Early entry','Late exit','Moved SL','No HTF bias','FOMO','Oversized','Broke rules'];
+const _upd=updatePaperTradingUI;
+updatePaperTradingUI=function(){
+  _upd.apply(null,arguments);
+  try{
+    const tr=document.querySelector('#j-view-log thead tr');
+    if(tr&&!tr.querySelector('.sb-th')){tr.insertAdjacentHTML('beforeend','<th class="sb-th">Mistake / Rating</th>')}
+    [...$('journal-body').children].forEach((row,i)=>{
+      const t=state.trades[i];if(!t||row.querySelector('.sb-sel'))return;
+      const td=document.createElement('td');
+      td.innerHTML='<select class="sb-sel sb-m">'+MISTAKES.map(m=>'<option value="'+m+'"'+(t.mistake===m?' selected':'')+'>'+(m||'- mistake -')+'</option>').join('')+'</select> '+
+        '<select class="sb-sel sb-r" style="max-width:48px">'+['','1','2','3','4','5'].map(r=>'<option value="'+r+'"'+(String(t.rating||'')===r?' selected':'')+'>'+(r?r+'\u2605':'-')+'</option>').join('')+'</select>';
+      td.addEventListener('click',e=>e.stopPropagation());
+      td.querySelector('.sb-m').onchange=e=>{t.mistake=e.target.value||undefined;persistTradesDual();updatePaperTradingUI()};
+      td.querySelector('.sb-r').onchange=e=>{t.rating=e.target.value?+e.target.value:undefined;persistTradesDual();updatePaperTradingUI()};
+      row.appendChild(td);
+    });
+  }catch(e){console.warn('[sb7] journal ui',e)}
+  scheduleSave();
+};
+const _bk=renderBreakdownTables;
+renderBreakdownTables=function(){
+  _bk.apply(null,arguments);
+  try{
+    const c=$('breakdown-container');if(!state.trades.length)return;
+    const trades=state.trades.filter(tradeMatchesTagFilter);if(!trades.length)return;
+    const tbl=(title,rows)=>'<div class="bk-group-title">'+title+'</div><table><thead><tr><th>Name</th><th>#</th><th>Win%</th><th>Avg R</th><th>Net P&amp;L</th></tr></thead><tbody>'+rows.map(r=>
+      '<tr><td><b>'+esc(r.key)+'</b></td><td>'+r.count+'</td><td>'+((r.wins/r.count)*100).toFixed(0)+'%</td><td>'+(r.rCount?(r.rSum/r.rCount).toFixed(2)+'R':'-')+'</td><td class="'+(r.netPnl>=0?'bull-txt':'bear-txt')+'">'+(r.netPnl>=0?'+':'')+'$'+r.netPnl.toFixed(2)+'</td></tr>').join('')+'</tbody></table>';
+    const byM=aggregateTradesBy(trades,t=>t.mistake||'None (clean)',null).reverse();
+    const byR=aggregateTradesBy(trades,t=>t.rating?t.rating+'\u2605 plan adherence':'Unrated',null).sort((a,b)=>a.key<b.key?1:-1);
+    const cost=trades.filter(t=>t.mistake).reduce((a,t)=>a+t.pnl,0);
+    c.insertAdjacentHTML('beforeend','<div class="bk-group-title" style="margin-top:12px">Discipline</div><div style="font-size:11px;margin-bottom:4px">P&amp;L of trades with a mistake: <b class="'+(cost>=0?'bull-txt':'bear-txt')+'">'+(cost>=0?'+':'')+'$'+cost.toFixed(2)+'</b></div>'+tbl('By Mistake (worst first)',byM)+tbl('By Plan-Adherence Rating',byR));
+  }catch(e){console.warn('[sb7] analytics',e)}
+};
+
+/* ---------- 1. SESSION SAVE / RESTORE ---------- */
+let saveT=null;
+function sessKey(){return 'sb7_session_'+state.datasetId}
+function saveSession(){
+  if(!state.isCustomCsv||state.replayIndex<0)return;
+  lsSet(sessKey(),{replayIndex:state.replayIndex,positions:state.positions,pendingOrders:state.pendingOrders,orderSeqId,currentTf:state.currentTf,htfTf:state.htfTf,at:Date.now()});
+}
+function scheduleSave(){clearTimeout(saveT);saveT=setTimeout(saveSession,400)}
+window.addEventListener('beforeunload',saveSession);
+function restoreSession(){
+  if(!state.isCustomCsv)return;
+  const s=lsGet(sessKey(),null);if(!s||s.replayIndex<0||s.replayIndex>=state.candles.length)return;
+  if(s.htfTf&&TF_SECONDS[s.htfTf])setHtfTimeframe(s.htfTf);
+  if(s.currentTf&&TF_SECONDS[s.currentTf])setTimeframe(s.currentTf);
+  state.replayIndex=s.replayIndex;state.intraTickStage=3;
+  state.positions=s.positions||[];state.pendingOrders=s.pendingOrders||[];
+  orderSeqId=Math.max(orderSeqId,s.orderSeqId||1);
+  rebuildAggregatedBars(false);syncAllOrderChartLines();updateStatusUI();_upd();
+  $('replay-start').value=new Date(state.candles[state.replayIndex].time*1000).toISOString().slice(0,16);
+  toast('Session restored ('+state.positions.length+' open, '+state.pendingOrders.length+' pending)');
+}
+
+/* ---------- 7. CSV QUALITY + loadDataset hook ---------- */
+let csvFresh=false;
+$('csv-input').addEventListener('change',()=>{csvFresh=true},true);
+function quality(cs){
+  const base=state.baseInterval,thr=Math.max(base*5,3600);let gaps=[],bad=0;
+  for(let i=0;i<cs.length;i++){const c=cs[i];if(c.high<Math.max(c.open,c.close)||c.low>Math.min(c.open,c.close)||c.high<c.low)bad++}
+  for(let i=1;i<cs.length;i++){const d=cs[i].time-cs[i-1].time;if(d<=thr)continue;
+    const a=new Date(cs[i-1].time*1000),b=new Date(cs[i].time*1000);
+    const wk=(a.getUTCDay()===5||a.getUTCDay()===6||a.getUTCDay()===0)&&d<=3*86400;
+    if(!wk)gaps.push({from:cs[i-1].time,hrs:d/3600})}
+  return{gaps,bad}
+}
+const fmtT=t=>new Date(t*1000).toISOString().replace('T',' ').slice(0,16);
+const _ld=loadDataset;
+loadDataset=function(candles,id,isCustom){
+  state.positions=[];state.pendingOrders=[];clearReview();
+  _ld.apply(null,arguments);
+  syncAllOrderChartLines();
+  loadAlerts();
+  if(!isCustom)return;
+  restoreSession();
+  if(csvFresh){csvFresh=false;
+    const q=quality(candles),top=q.gaps.sort((a,b)=>b.hrs-a.hrs).slice(0,6);
+    showModal('CSV data check','<div class="sb-row"><span>Range</span><b>'+fmtT(candles[0].time)+' &rarr; '+fmtT(candles[candles.length-1].time)+'</b></div>'+
+     '<div class="sb-row"><span>Candles / base interval</span><b>'+candles.length.toLocaleString()+' / '+Math.round(state.baseInterval/60)+'m</b></div>'+
+     '<div class="sb-row"><span>Invalid candles (H/L inconsistent)</span><b class="'+(q.bad?'bear-txt':'bull-txt')+'">'+q.bad+'</b></div>'+
+     '<div class="sb-row"><span>Unexpected gaps (excl. weekends)</span><b class="'+(q.gaps.length?'warn-txt':'bull-txt')+'">'+q.gaps.length+'</b></div>'+
+     (top.length?'<div style="font-size:10px;color:var(--text-muted)">Largest: '+top.map(g=>fmtT(g.from)+' (+'+g.hrs.toFixed(1)+'h)').join('; ')+'</div>':'')+
+     '<div style="font-size:10px;color:var(--text-muted);margin-top:6px">Duplicates are removed automatically on load.</div>');
   }
+};
 
-  async function scanDataFolder() {
-    sel.innerHTML = '<option value="">Scanning History-Data...</option>';
-    try {
-      const rootEntries = await listDir('');
-      const groups = {};
+/* ---------- 3. TRADE REVIEW MODE ---------- */
+let reviewLines=[];
+function clearReview(){reviewLines.forEach(l=>series.removePriceLine(l));reviewLines=[]}
+$('journal-body').addEventListener('click',e=>{
+  const row=e.target.closest('tr');if(!row||e.target.closest('button,select'))return;
+  const t=state.trades[[...$('journal-body').children].indexOf(row)];if(!t)return;
+  const idx=state.candles.findIndex(c=>c.time>=t.entryTime);if(idx<0)return;
+  pauseReplay();clearReview();jumpToIndex(idx);
+  const col=t.pnl>=0?'#26a69a':'#ef5350';
+  reviewLines.push(series.createPriceLine({price:t.entry,color:'#2962ff',title:'REVIEW '+t.side+' ENTRY'}));
+  reviewLines.push(series.createPriceLine({price:t.exit,color:col,lineDash:[3,3],title:'REVIEW EXIT ('+(t.reason||'')+')'}));
+  journalModal.classList.remove('open');
+  toast('Review: '+t.side+' '+t.lots+'L '+(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2)+' - step forward to replay it (Esc clears lines)',6000);
+});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){clearReview();measure=null}});
 
-      for (const entry of rootEntries) {
-        if (!entry) continue;
-        if (entry.type === 'directory') {
-          const sym = entry.name;
-          const subEntries = await listDir(encodeURIComponent(sym) + '/');
-          const files = subEntries
-            .filter((e) => e && e.type === 'file' && /\.(csv|json|txt)$/i.test(e.name))
-            .map((e) => ({ path: `${sym}/${e.name}`, label: e.name }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-          if (files.length) groups[sym] = files;
-        } else if (entry.type === 'file' && /\.(csv|json|txt)$/i.test(entry.name)) {
-          (groups['General'] ||= []).push({ path: entry.name, label: entry.name });
-        }
-      }
+/* ---------- 6. DRAWING POLISH: copy/paste, lock, measure, alerts ---------- */
+let clip=null;
+window.addEventListener('keydown',e=>{
+  const tg=(e.target.tagName||'').toUpperCase();if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;
+  const d=state.drawings[state.selectedDrawingIdx];
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'&&d){clip=JSON.stringify(d);toast('Drawing copied (Ctrl+V to paste)',1500);return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='v'&&clip){
+    e.preventDefault();const n=JSON.parse(clip),dt=3*TF_SECONDS[state.currentTf];
+    (n.points||[]).forEach(p=>p.time+=dt);(n.candles||[]).forEach(c=>c.time+=dt);delete n.locked;
+    pushDrawingHistory();state.drawings.push(n);state.selectedDrawingIdx=state.drawings.length-1;
+    saveToStorage('tv_drawings_'+state.datasetId,state.drawings);return}
+  if(e.altKey&&e.key.toLowerCase()==='l'&&d){e.preventDefault();d.locked=!d.locked;saveToStorage('tv_drawings_'+state.datasetId,state.drawings);toast(d.locked?'Drawing locked':'Drawing unlocked',1500);return}
+  if(e.altKey&&e.key.toLowerCase()==='b'){e.preventDefault();btnBlind.click()}
+});
+window.addEventListener('keydown',e=>{
+  if((e.key==='Delete'||e.key==='Backspace')&&!/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||'').toUpperCase())){
+    const d=state.drawings[state.selectedDrawingIdx];
+    if(d&&d.locked){e.preventDefault();e.stopImmediatePropagation();toast('Drawing is locked (Alt+L to unlock)',2000)}}
+},true);
+chartWrapper.addEventListener('mousedown',()=>{
+  if (state.cutModeActive) return;
+  const ed=state.dragEdit;if(ed&&state.drawings[ed.drawingIdx]&&state.drawings[ed.drawingIdx].locked){state.dragEdit=null;chart.setPanEnabled(true)}
+});
+function addToolBtn(tool,html,title){
+  const b=document.createElement('button');b.className='tool-btn';b.dataset.tool=tool;b.title=title;b.innerHTML=html;
+  const anchor=document.querySelector('.tool-btn[data-tool="text"]');anchor.parentNode.insertBefore(b,anchor.nextSibling);
+  b.addEventListener('click',()=>setActiveTool(tool));return b;
+}
+const ico=p=>'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">'+p+'</svg>';
+addToolBtn('alert',ico('<path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/>'),'Price Alert: click a level; replay pauses when price touches it');
+addToolBtn('measure',ico('<path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/>'),'Measure: drag to see price / % / bars');
 
-      const groupNames = Object.keys(groups).sort();
-      if (!groupNames.length) {
-        sel.innerHTML = '<option value="">No CSV/JSON in History-Data</option>';
-        return;
-      }
-
-      sel.innerHTML = groupNames.map((g) =>
-        `<optgroup label="${g}">${groups[g].map((f) =>
-          `<option value="${f.path.split('/').map(encodeURIComponent).join('/')}">${g} — ${f.label}</option>`
-        ).join('')}</optgroup>`
-      ).join('');
-
-      const last = localStorage.getItem('sadatia_last_server_file');
-      if (last) {
-        const encodedLast = last.split('/').map(encodeURIComponent).join('/');
-        if ([...sel.options].some((o) => o.value === encodedLast)) sel.value = encodedLast;
-      }
-    } catch (err) {
-      sel.innerHTML = '<option value="">/data/ unavailable</option>';
-      console.warn('[ServerData]', err);
-    }
+let measure=null;const mc=document.createElement('canvas');mc.id='sb-measure';chartWrapper.appendChild(mc);const mx=mc.getContext('2d');
+const rel=e=>{const r=chartWrapper.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+chartWrapper.addEventListener('mousedown',e=>{
+  if (state.cutModeActive) return;
+  if(e.button!==0)return;const p=rel(e),dm=chart.getDimensions();
+  if(state.activeTool==='measure'){e.stopPropagation();if(p.x<=dm.plotW&&p.y<=dm.plotH)measure={x1:p.x,y1:p.y,x2:p.x,y2:p.y,done:false}}
+  else if(state.activeTool==='alert'){e.stopPropagation();if(p.x<=dm.plotW&&p.y<=dm.plotH){addAlert(+series.coordinateToPrice(p.y).toFixed(getExecutionParams().decimals));setActiveTool('cursor')}}
+},true);
+chartWrapper.addEventListener('mouseup',e=>{if(state.activeTool==='measure'){e.stopPropagation();if(measure)measure.done=true}},true);
+window.addEventListener('mousemove',e=>{if(measure&&!measure.done){const p=rel(e);measure.x2=p.x;measure.y2=p.y}});
+(function loop(){
+  const r=chartWrapper.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  if(mc.width!==Math.round(r.width*dpr)||mc.height!==Math.round(r.height*dpr)){mc.width=Math.round(r.width*dpr);mc.height=Math.round(r.height*dpr)}
+  mx.setTransform(dpr,0,0,dpr,0,0);mx.clearRect(0,0,r.width,r.height);
+  if(measure){
+    const m=measure,p1=series.coordinateToPrice(m.y1),p2=series.coordinateToPrice(m.y2),dp=p2-p1,up=dp>=0;
+    const ep=getExecutionParams(),bars=Math.round((xToTime(m.x2)-xToTime(m.x1))/TF_SECONDS[state.currentTf]);
+    const col=up?'#26a69a':'#ef5350';
+    mx.fillStyle=up?'rgba(38,166,154,.15)':'rgba(239,83,80,.15)';mx.strokeStyle=col;mx.lineWidth=1;
+    mx.fillRect(Math.min(m.x1,m.x2),Math.min(m.y1,m.y2),Math.abs(m.x2-m.x1),Math.abs(m.y2-m.y1));
+    mx.strokeRect(Math.min(m.x1,m.x2),Math.min(m.y1,m.y2),Math.abs(m.x2-m.x1),Math.abs(m.y2-m.y1));
+    const mins=Math.abs(bars)*TF_SECONDS[state.currentTf]/60,tt=mins>=60?(mins/60).toFixed(1)+'h':mins+'m';
+    const txt=(up?'+':'')+dp.toFixed(ep.decimals)+' ('+Math.round(dp/ep.unitSize)+' '+ep.unitLabel+') '+((dp/p1)*100).toFixed(2)+'% | '+Math.abs(bars)+' bars | '+tt;
+    mx.font='bold 11px monospace';const w=mx.measureText(txt).width+12,bx=Math.max(4,Math.min(r.width-w-72,(m.x1+m.x2)/2-w/2)),by=Math.max(4,Math.min(m.y1,m.y2)-24);
+    mx.fillStyle='rgba(19,23,34,.92)';mx.fillRect(bx,by,w,18);mx.strokeRect(bx,by,w,18);mx.fillStyle='#fff';mx.fillText(txt,bx+6,by+13);
   }
-
-  async function loadSelectedFile() {
-    const encodedPath = sel.value;
-    if (!encodedPath) return;
-    const rawPath = encodedPath.split('/').map(decodeURIComponent).join('/');
-    const filename = rawPath.split('/').pop();
-    btnLoad.disabled = true;
-    const origText = btnLoad.textContent;
-    btnLoad.textContent = '...';
-
-    try {
-      const res = await fetch('/data/' + encodedPath);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const blob = await res.blob();
-      const file = new File([blob], filename, {
-        type: filename.endsWith('.json') ? 'application/json' : 'text/csv'
-      });
-
-      const fileInput = document.querySelector('input[type="file"]');
-      if (!fileInput) throw new Error('File input not found');
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      fileInput.files = dt.files;
-      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
-
-      localStorage.setItem('sadatia_last_server_file', rawPath);
-    } catch (err) {
-      alert('Could not load ' + rawPath + ': ' + err.message);
-    } finally {
-      btnLoad.disabled = false;
-      btnLoad.textContent = origText;
-    }
-  }
-
-  btnLoad.addEventListener('click', loadSelectedFile);
-  btnRefresh.addEventListener('click', scanDataFolder);
-  sel.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadSelectedFile(); });
-
-  scanDataFolder();
+  requestAnimationFrame(loop);
 })();
-</script>
 
+let alerts=[],alertLines=[];
+const aKey=()=>'sb7_alerts_'+state.datasetId;
+function drawAlerts(){alertLines.forEach(l=>series.removePriceLine(l));alertLines=alerts.map(a=>series.createPriceLine({price:a.price,color:'#ffeb3b',lineDash:[6,3],title:'ALERT '+a.price}))}
+function loadAlerts(){alerts=lsGet(aKey(),[]);drawAlerts()}
+function addAlert(p){alerts.push({price:p});lsSet(aKey(),alerts);drawAlerts();toast('Alert set at '+p,1800)}
+const _eval=evaluateOrdersAndPositionsOnCandle;
+evaluateOrdersAndPositionsOnCandle=function(candle){
+  _eval.apply(null,arguments);
+  if(!alerts.length)return;
+  const hit=alerts.filter(a=>candle.low<=a.price&&candle.high>=a.price);
+  if(hit.length){alerts=alerts.filter(a=>!hit.includes(a));lsSet(aKey(),alerts);drawAlerts();pauseReplay();state.stopJump=true;toast('ALERT hit: '+hit.map(h=>h.price).join(', '),5000)}
+};
+$('btn-clear-draw').addEventListener('dblclick',()=>{if(alerts.length){alerts=[];lsSet(aKey(),alerts);drawAlerts();toast('Alerts cleared')}});
+loadAlerts();
+})();
+
+let cutMouseDownPos = null;
+
+function setCutMode(active) {
+  state.cutModeActive = !!active;
+  state.cutHoverX = -1;
+  state.cutHoverBar = null;
+
+  const btnCut = document.getElementById('btn-cut-mode');
+  const cutBanner = document.getElementById('cut-mode-banner');
+  if (btnCut) btnCut.classList.toggle('active', state.cutModeActive);
+  if (cutBanner) cutBanner.style.display = state.cutModeActive ? 'flex' : 'none';
+
+  if (state.cutModeActive) {
+    pauseReplay();
+    setActiveTool('cursor');
+    chart.setPanEnabled(true);
+    chartWrapper.style.cursor = 'col-resize';
+  } else {
+    chartWrapper.style.cursor = state.activeTool === 'cursor' ? 'default' : 'crosshair';
+  }
+}
+
+// Track click start so dragging the chart doesn't accidentally trigger a cut
+chartWrapper.addEventListener('mousedown', (e) => {
+  
+  if (e.button === 0 && state.cutModeActive) {
+    cutMouseDownPos = { x: e.clientX, y: e.clientY };
+  }
+}, true);
+
+// Track hovered candlestick under cursor during Cut Mode
+chartWrapper.addEventListener('mousemove', (e) => {
+  if (!state.cutModeActive || !state.bars.length) return;
+  const rect = chartWrapper.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const { plotW } = chart.getDimensions();
+
+  if (x >= 0 && x <= plotW) {
+    state.cutHoverX = x;
+    const logical = Math.round(chart.timeScale().coordinateToLogical(x));
+    const clampedIdx = Math.max(0, Math.min(state.bars.length - 1, logical));
+    state.cutHoverBar = state.bars[clampedIdx] || null;
+  } else {
+    state.cutHoverX = -1;
+    state.cutHoverBar = null;
+  }
+});
+
+// Slice timeline on clean click (< 5px drag movement)
+chartWrapper.addEventListener('mouseup', (e) => {
+  if (e.button !== 0 || !state.cutModeActive || !cutMouseDownPos) return;
+  const dist = Math.hypot(e.clientX - cutMouseDownPos.x, e.clientY - cutMouseDownPos.y);
+  cutMouseDownPos = null;
+
+  if (dist < 5 && state.cutHoverBar && state.candles.length) {
+    const targetTime = state.cutHoverBar.time;
+    let rawIdx = state.candles.findIndex(c => c.time >= targetTime);
+    if (rawIdx === -1) rawIdx = state.candles.length - 1;
+    jumpToIndex(rawIdx);
+    setCutMode(false);
+  }
+});
+
+// Button bindings
+document.getElementById('btn-cut-mode')?.addEventListener('click', () => setCutMode(!state.cutModeActive));
+document.getElementById('btn-cancel-cut')?.addEventListener('click', () => setCutMode(false));
+</script>
 </body>
 </html>
